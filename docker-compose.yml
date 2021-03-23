@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo:4.4.4
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: subscriptions
+    volumes:
+      - ./scripts/start-mongodb.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongodb-datadir:/data/db
+
+  backend:
+    build: ./subscription-plans-backend/
+    links:
+      - mongodb
+    ports:
+      - "3001:3001"
+    environment:
+      ## User is created in the scripts/start-mongodb.js script
+      DB_URL: mongodb://subscriptions:subscriptions@mongodb:27017/subscriptions
+  frontend:
+    build: ./subscription-plans-application/
+    links:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_BACKEND_URL_BASE: http://localhost:3001
