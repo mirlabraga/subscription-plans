@@ -13,20 +13,21 @@ services:
       - ./scripts/start-mongodb.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - ./mongodb-datadir:/data/db
 
-  # backend:
-  #   build: ./subscription-plans-backend/
-  #   links:
-  #     - mongodb
-  #   ports:
-  #     - "3001:3001"
-  #   environment:
-  #     ## User is created in the scripts/start-mongodb.js script
-  #     DB_URL: mongodb://subscriptions:subscriptions@mongodb:27017/subscriptions
-  # frontend:
-  #   build: ./subscription-plans-application/
-  #   links:
-  #     - backend
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     REACT_APP_BACKEND_URL_BASE: http://localhost:3001
+  backend:
+    build: ./backend/
+    links:
+      - mongodb
+    ports:
+      - "3001:3001"
+    environment:
+      ## User is created in the scripts/start-mongodb.js script
+      DB_URL: mongodb://subscriptions:subscriptions@mongodb:27017/subscriptions
+  frontend:
+    build: ./frontend/
+    links:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      ## url will be runned from your machine
+      REACT_APP_BACKEND_URL_BASE: http://localhost:3001
